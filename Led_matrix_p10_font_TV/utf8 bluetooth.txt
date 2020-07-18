@@ -1,0 +1,86 @@
+bluetooth
+
+
+// CHỮ CÓ DẤU
+ 
+ă : 01 03 	Ă : 01 02
+â : E2 		Â : C2
+đ : 01 11	Đ : 01 10
+ê : EA 		Ê : CA
+ư : 01 B0	Ư : 01 AF
+ô : F4		Ô : D4
+ơ : 01 A1	Ơ : 01 A0
+
+
+// DẤU NẶNG
+ạ 	1E A1	*	Ạ 	1E A0
+ặ	1E B7		Ặ	1E B6
+ậ	1E AD		Ậ	1E AC
+ẹ	1E B9		Ẹ 	1E B8
+ệ	1E C7		Ệ 	1E C6
+ị	1E CB		Ị 	1E CA
+ọ	1E CD		Ọ	1E CC	*
+ộ	1E D9		Ộ	1E D8
+ợ	1E E3		Ợ 	1E E2
+ụ	1E E5		Ụ 	1E E4
+ự	1E F1	*	Ự	1E F0	
+ỵ	1E F5		Ỵ	1E F4	*
+
+
+// dẫu ngã
+
+ã	E3			Ã 	C3
+ẵ	1E B5		Ẵ	1E B4
+ẫ	1E AB		Ẫ	1E AA
+ẽ	1E BD		Ẽ	1E BC
+ễ	1E C5		Ễ	1E C4
+ĩ	01 29		Ĩ 	01 28
+õ	F5			Õ	D5
+ỗ	1E D7		Ỗ	1E D6
+ỡ	1E E1		Ỡ	1E E0
+ũ	01 69		Ũ	01 68
+ữ	1E EF		Ữ	1E EE
+ỹ	1E F9		Ỹ	1E F8
+
+// dấu huyền
+à	E0			À	C0
+ằ	1E B1		Ằ	1E B0
+ầ	1E A7		Ầ	1E A6
+è	E8			È	C8
+ề	1E C1		Ề	1E C0
+ì	EC			Ì	CC
+ò	F2			Ò	D2
+ồ	1E D3		Ồ 	1E D2
+ờ	1E DD		Ờ	1E DC
+ù	F9			Ù	D9
+ừ	1E EB		Ừ	1E EA
+ỳ	1E F3		Ỳ	1E F2
+
+// dấu sắc
+
+á	E1			Á	C1
+ắ	1E AF		Ắ	1E AE
+ấ	1E A5		Ấ	1E A4
+é	E9			É	C9
+ế	1E BF		Ế	1E BE
+í	ED			Í	CD
+ó	F3			Ó	D3
+ố	1E D1		Ố	1E D0
+ớ	1E DB		Ớ	1E DA
+ú	FA			Ú	DA
+ứ	1E E9		Ứ	1E E8
+ý	FD			Ý	DD
+ dấu hỏi
+ả 	1E A3		Ả	1E A2
+ẳ	1E B3		Ẳ	1E B2
+ẩ	1E A9		Ẩ	1E A8
+ẻ	1E BB		Ẻ	1E BA
+ể	1E C3		Ể	1E C2
+ỉ	1E C9		Ỉ	1E C8
+ỏ	1E CF		Ỏ	1E CE
+ổ	1E D5		Ổ	1E D4
+ở	1E DF		Ở	1E DE
+ủ	1E E7		Ủ	1E E6
+ử	1E ED		Ử	1E EC
+ỷ	1E F7		Ỷ	1E F6
+ 

@@ -1,0 +1,46 @@
+
+// ------------------ CHU KHONG DAU --------------------
+
+ă : C4 83 	Ă : C4 82
+â : C3 A2	Â : C3 82
+đ : C4 91	Đ : C4 90
+ê : C3 AA	Ê : C3 8A
+ư : C6 B0	Ư : C6 AF
+ô : C3 B4	Ô : C3 94
+ơ : C6 A1	Ơ : C6 A0
+
+//------------------- CHU CO DAU ----------------------
+
+// DẤU NẶNG
+ạ : E1 BA A1			Ạ : E1 BA A0
+ặ : E1 BA B7			Ặ : E1 BA B6
+ậ : E1 BA AD			Ậ : E1 BA AC
+ẹ : E1 BA B9			Ẹ : E1 BA B8
+ệ : E1 BB 87			Ệ : E1 BB 86
+ị : E1 BB 8B			Ị : E1 BB 8A
+ọ : E1 BB 8D			Ọ : E1 BB 8C
+ộ : E1 BB 99			Ộ : E1 BB 98
+ợ : E1 BB A3			Ợ : E1 BB A2
+ụ : E1 BB A5			Ụ : E1 BB A4
+ự : E1 BB B1			Ự : E1 BB B0
+
+
+// DẤU NGÃ
+
+// DẤU NẶNG
+ạ : C3 A3 				Ạ : C3 83
+ặ : E1 BA B5			Ặ : E1 BA B4
+ậ : E1 BA AD			Ậ : E1 BA AC
+ẹ : E1 BA B9			Ẹ : E1 BA B8
+ệ : E1 BB 87			Ệ : E1 BB 86
+ị : E1 BB 8B			Ị : E1 BB 8A
+ọ : E1 BB 8D			Ọ : E1 BB 8C
+ộ : E1 BB 99			Ộ : E1 BB 98
+ợ : E1 BB A3			Ợ : E1 BB A2
+ụ : E1 BB A5			Ụ : E1 BB A4
+ự : E1 BB B1			Ự : E1 BB B0
+
+
+
+
+

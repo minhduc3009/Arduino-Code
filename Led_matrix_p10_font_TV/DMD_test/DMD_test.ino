@@ -1,0 +1,422 @@
+/*--------------------------------------------------------------------------------------
+
+ dmd_test.cpp 
+   Demo and example project for the Freetronics DMD, a 512 LED matrix display
+   panel arranged in a 32 x 16 layout.
+
+ Copyright (C) 2011 Marc Alexander (info <at> freetronics <dot> com)
+
+ See http://www.freetronics.com/dmd for resources and a getting started guide.
+
+ Note that the DMD library uses the SPI port for the fastest, low overhead writing to the
+ display. Keep an eye on conflicts if there are any other devices running from the same
+ SPI port, and that the chip select on those devices is correctly set to be inactive
+ when the DMD is being written to.
+
+ USAGE NOTES
+ -----------
+
+ - Place the DMD library folder into the "arduino/libraries/" folder of your Arduino installation.
+ - Get the TimerOne library from here: http://code.google.com/p/arduino-timerone/downloads/list
+   or download the local copy from the DMD library page (which may be older but was used for this creation)
+   and place the TimerOne library folder into the "arduino/libraries/" folder of your Arduino installation.
+ - Restart the IDE.
+ - In the Arduino IDE, you can open File > Examples > DMD > dmd_demo, or dmd_clock_readout, and get it
+   running straight away!
+
+ * The DMD comes with a pre-made data cable and DMDCON connector board so you can plug-and-play straight
+   into any regular size Arduino Board (Uno, Freetronics Eleven, EtherTen, USBDroid, etc)
+  
+ * Please note that the Mega boards have SPI on different pins, so this library does not currently support
+   the DMDCON connector board for direct connection to Mega's, please jumper the DMDCON pins to the
+   matching SPI pins on the other header on the Mega boards.
+
+ This example code is in the public domain.
+ The DMD library is open source (GPL), for more see DMD.cpp and DMD.h
+
+--------------------------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------------------------
+  Includes
+--------------------------------------------------------------------------------------*/
+
+#include <SPI.h>        //SPI.h must be included as DMD is written by SPI (the IDE complains otherwise)
+#include <DMD.h>        //
+#include <TimerOne.h>   //
+#include <EEPROM.h>
+#include "SystemFont5x7.h"
+#include "Arial_black_16.h"
+
+//Fire up the DMD library as dmd
+#define DISPLAYS_ACROSS 1
+#define DISPLAYS_DOWN 1
+DMD dmd(DISPLAYS_ACROSS, DISPLAYS_DOWN);
+
+//--------------- EEProm -----------------------------------------
+String inputString = "";         // a string to hold incoming data
+boolean stringComplete = false;  // whether the string is complete
+char Readout[200];
+char ReadoutScrool[200],ReadoutNormal[200];
+boolean FlagMode = false,FlagMode2 = false,FlagMode3 = false;
+
+int kyhieu=32;
+
+char Mode1Line1_1[10],Mode1Line1_2[10],Mode1Line1_3[10],Mode1Line1_4[10],Mode1Line1_5[10];
+char Mode1Line2_1[10],Mode1Line2_2[10],Mode1Line2_3[10],Mode1Line2_4[10],Mode1Line2_5[10];
+char Mode1[10];
+int dem;
+/*--------------------------------------------------------------------------------------
+  Interrupt handler for Timer1 (TimerOne) driven DMD refresh scanning, this gets
+  called at the period set in Timer1.initialize();
+--------------------------------------------------------------------------------------*/
+void ScanDMD()
+{ 
+  dmd.scanDisplayBySPI();
+}
+
+/*--------------------------------------------------------------------------------------
+  setup
+  Called by the Arduino architecture before the main loop begins
+--------------------------------------------------------------------------------------*/
+void setup(void)
+{
+
+   //initialize TimerOne's interrupt/CPU usage used to scan and refresh the display
+   Timer1.initialize( 5000 );           //period in microseconds to call ScanDMD. Anything longer than 5000 (5ms) and you can see flicker.
+   Timer1.attachInterrupt( ScanDMD );   //attach the Timer1 interrupt to ScanDMD which goes to dmd.scanDisplayBySPI()
+
+   //clear/init the DMD pixels held in RAM
+   dmd.clearScreen( true );   //true is normal (all pixels off), false is negative (all pixels on)
+   
+   
+   Serial.begin(9600);
+  // reserve 200 bytes for the inputString:
+  inputString.reserve(200);
+}
+
+/*--------------------------------------------------------------------------------------
+  loop
+  Arduino architecture main loop
+--------------------------------------------------------------------------------------*/
+void loop() {
+  int i;
+      // print the string when a newline arrives:
+      if (stringComplete) {
+       // Serial.println(inputString);
+        // clear the string:
+        for(i=0;i<200;i++)
+        {
+          EEPROM.write(i,0);
+        }
+        for(i=0; i < inputString.length() ;i++)
+        {
+          EEPROM.write(i,inputString[i]);
+        }
+        inputString = "";
+        Readdata();
+      }
+  
+   Readdata();
+   if(FlagMode)
+   {
+//     if(strlen(Mode1Line1_1) > 0 || strlen(Mode1Line2_1) > 0)
+//     {
+//       drawNormalText(Mode1Line1_1,Mode1Line2_1);
+//     }
+//     
+//     if(strlen(Mode1Line1_2) > 0 || strlen(Mode1Line2_2) > 0)
+//     {
+//       drawNormalText(Mode1Line1_2,Mode1Line2_2);
+//     }
+//     
+//     if(strlen(Mode1Line1_3) > 0 || strlen(Mode1Line2_3) > 0)
+//     {
+//       drawNormalText(Mode1Line1_3,Mode1Line2_3);
+//     }
+    Normaltext();
+     
+   }
+  
+  if (FlagMode2)
+  {
+    drawText(Readout);
+  }
+  
+  if(FlagMode3)
+  {
+    
+     Normaltext();
+     if(strlen(ReadoutScrool)>0) drawText(ReadoutScrool);
+  }
+  
+  
+}
+
+void Readdata()
+{
+  int i,j,t;
+  
+  // Select che do
+            if(EEPROM.read(0)=='1')
+              {
+                
+                FlagMode=true;
+                FlagMode3=false;
+                FlagMode2=false;
+              }
+           if(EEPROM.read(0)=='2')
+              {
+                FlagMode=false;
+                FlagMode2=true;
+                FlagMode3=false;
+              }  
+           if(EEPROM.read(0)=='3')
+              {
+                FlagMode=false;
+                FlagMode2=false;
+                FlagMode3=true;
+              }
+              
+       // che do 1 --------------------       
+           if(FlagMode)
+           {
+             
+             for(i=0;i<200;i++)Readout[i]=0;// xoa du lieu mang cu
+             
+             for(i=1;i<200;i++)
+              {
+                Readout[i-1]=EEPROM.read(i);
+                if(EEPROM.read(i)==13)
+                  {
+                    i=209; // thoat khoi vong lap
+                  }
+              }
+          if(strlen(Readout)>0)  tachchu(Readout);  
+            
+           }
+    //-------------------- che do 2 ------------------------------
+          if(FlagMode2)
+          {
+            for(i=0;i<200;i++)Readout[i]=0;// xoa du lieu mang cu
+             
+             for(i=1;i<200;i++)
+              {
+                Readout[i-1]=EEPROM.read(i);
+                if(EEPROM.read(i)==13)
+                  {
+                    i=209; // thoat khoi vong lap
+                  }
+              }
+           // Serial.println(Readout);
+           }
+          
+    //--------------------- che do 3 ----------------------------------
+          if(FlagMode3)
+          {
+             for(i=0;i<200;i++)
+             {
+               Readout[i]=0;// xoa du lieu mang cu
+               ReadoutNormal[i]=0;
+               ReadoutScrool[i]=0;
+             }
+             for(i=1;i<200;i++)
+              {
+                ReadoutNormal[i-1]=EEPROM.read(i);
+                if(EEPROM.read(i)=='#')
+                  {
+                    j=i;
+                    i=209; // thoat khoi vong lap
+                  }
+                  if(EEPROM.read(i)==13)
+                  {
+                    i=209; // thoat khoi vong lap
+                  }
+               }
+               if(j>0)
+                 {
+                   t=j;
+                   for(j=j+1;j<200;j++)
+                   {
+                     ReadoutScrool[j-t-1]=EEPROM.read(j);
+                     if (EEPROM.read(j)==13)
+                      j=209; 
+                   }
+                   j=0;
+                 }  
+           if(strlen(ReadoutNormal)>0) tachchu(ReadoutNormal); 
+               
+           }
+    stringComplete = false; 
+}
+/*
+  SerialEvent occurs whenever a new data comes in the
+ hardware serial RX.  This routine is run between each
+ time loop() runs, so using delay inside loop can delay
+ response.  Multiple bytes of data may be available.
+ */
+void serialEvent() {
+  while (Serial.available()) {
+    // get the new byte:
+    char inChar = (char)Serial.read();
+    // add it to the inputString:
+    if(inChar!=0)
+    inputString += inChar;
+    // if the incoming character is a newline, set a flag
+    // so the main loop can do something about it:
+    if (inChar == '\n') {
+      stringComplete = true;
+      Serial.println("OK");
+      FlagMode=false;
+      FlagMode3=false;
+      FlagMode2=false;
+      for(dem=0;dem<10;dem++)
+      {
+        Mode1Line1_1[dem]=0;
+        Mode1Line1_2[dem]=0;
+        Mode1Line1_3[dem]=0;
+        Mode1Line1_4[dem]=0;
+        Mode1Line1_5[dem]=0;
+        Mode1Line2_1[dem]=0;
+        Mode1Line2_2[dem]=0;
+        Mode1Line2_3[dem]=0;
+        Mode1Line2_4[dem]=0;
+        Mode1Line2_5[dem]=0;
+        
+      }
+    }
+  }
+}
+
+void Normaltext()
+{
+  
+  if(strlen(Mode1Line1_1) > 0 || strlen(Mode1Line2_1) > 0)
+     {
+       drawNormalText(Mode1Line1_1,Mode1Line2_1);
+     }
+     
+     if(strlen(Mode1Line1_2) > 0 || strlen(Mode1Line2_2) > 0)
+     {
+       drawNormalText(Mode1Line1_2,Mode1Line2_2);
+     }
+     
+     if(strlen(Mode1Line1_3) > 0 || strlen(Mode1Line2_3) > 0)
+     {
+       drawNormalText(Mode1Line1_3,Mode1Line2_3);
+     }
+  
+}
+
+void tachchu(char* Readout)
+{
+  int i;
+              
+             for(i=0;i<strlen(Readout);i++)
+               {
+                 Mode1Line1_1[i]=Readout[i];
+                 if(Readout[i]==kyhieu) i=209;
+               }
+            // Serial.println(Mode1Line1_1);
+            //--------------------------------
+             i=strlen(Mode1Line1_1);
+             if(i<strlen(Readout)-1)
+             {
+               dem=i;
+               for(i;i<strlen(Readout);i++)
+                 {
+                   Mode1Line2_1[i-dem]=Readout[i];
+                   if(Readout[i]==kyhieu) i=209 ;
+                 }
+           //    Serial.println(Mode1Line2_1);
+             }
+             //-------------------------------
+
+              i=strlen(Mode1Line1_1)+strlen(Mode1Line2_1);
+             if(i<strlen(Readout)-1)
+             {
+               dem=i;
+               for(i;i<strlen(Readout);i++)
+                 {
+                   
+                    Mode1Line1_2[i-dem]=Readout[i];
+                     if(Readout[i]==kyhieu) i=209;
+                 }
+          //     Serial.println(Mode1Line1_2);
+             }
+             //-------------------------------
+             
+             i=strlen(Mode1Line1_1)+strlen(Mode1Line2_1)+strlen(Mode1Line1_2);
+             if(i<strlen(Readout)-1)
+             {
+               dem=i;
+               for(i;i<strlen(Readout);i++)
+                 {
+                   
+                    Mode1Line2_2[i-dem]=Readout[i];
+                     if(Readout[i]==kyhieu) i=209;
+                 }
+           //    Serial.println(Mode1Line2_2);
+             }
+             //-------------------------------
+             
+             i=strlen(Mode1Line1_1)+strlen(Mode1Line2_1)+strlen(Mode1Line1_2)+strlen(Mode1Line2_2);
+             if(i<strlen(Readout)-1)
+             {
+               dem=i;
+               for(i;i<strlen(Readout);i++)
+                 {
+                   
+                    Mode1Line1_3[i-dem]=Readout[i];
+                     if(Readout[i]==kyhieu) i=209;
+                 }
+            //   Serial.println(Mode1Line1_3);
+             }
+             //-------------------------------
+            i=strlen(Mode1Line1_1)+strlen(Mode1Line2_1)+strlen(Mode1Line1_2)+strlen(Mode1Line2_2)+strlen(Mode1Line1_3);
+             if(i<strlen(Readout)-1)
+             {
+               dem=i;
+               for(i;i<strlen(Readout);i++)
+                 {
+                   
+                    Mode1Line2_3[i-dem]=Readout[i];
+                     if(Readout[i]==kyhieu) i=209;
+                 }
+            //   Serial.println(Mode1Line2_3);
+             }  
+}
+void drawNormalText(char* text1, char* text2)
+{
+     // display some text
+   dmd.clearScreen( true );
+   dmd.selectFont(System5x7);
+   for (byte x=0;x<DISPLAYS_ACROSS;x++) {
+     for (byte y=0;y<DISPLAYS_DOWN;y++) {
+       dmd.drawString(  2+(32*x),  1+(16*y), text1, 5, GRAPHICS_NORMAL );
+       dmd.drawString(  2+(32*x),  9+(16*y), text2, 5, GRAPHICS_NORMAL );
+     }
+   }
+   delay( 3000 );
+}
+
+// scroll text
+void drawText( String dispString ) 
+{
+  dmd.clearScreen( true );
+  dmd.selectFont( Arial_Black_16 );
+  char newString[256];
+  int sLength = dispString.length();
+  dispString.toCharArray( newString, sLength+1 );
+  dmd.drawMarquee( newString , sLength , ( 32*DISPLAYS_ACROSS )-1 ,0);
+  long start=millis();
+  long timer=start;
+  long timer2=start;
+  boolean ret=false;
+  while( !ret ){
+    if ( ( timer+30 ) < millis() ) {
+      ret=dmd.stepMarquee( -1 , 0 );
+      timer=millis();
+    }
+  }
+}
+
